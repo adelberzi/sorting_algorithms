@@ -1,87 +1,88 @@
-#include "sortt.h"
-/**
- * swapnext - swaps a node with the next node in a doubly linked list
- * @current: the current node
- * @head: head of the doubly linked list
- */
-void swapnext(listint_t *current, listint_t **head)
-{
-	listint_t *tmp = NULL;
+#include "sort.h"
 
-	tmp = current->next;
+/**
+ * _swap - Swaps two nodes of doubly linked list
+ *
+ * @node: node base to change
+ * @list: double link list head
+ *
+ * Return: No Return
+ */
+void _swap(listint_t **node, listint_t **list)
+{
+	listint_t *tmp = *node, *tmp2, *tmp3;
+
+
+	if (!(*node)->prev)
+		*list = (*node)->next;
+
+	tmp = tmp3 = *node;
+	tmp2 = tmp->next;
+
+	tmp->next = tmp2->next;
+	tmp3 = tmp->prev;
+	tmp->prev = tmp2;
+	tmp2->next = tmp;
+	tmp2->prev = tmp3;
+
+	if (tmp2->prev)
+		tmp2->prev->next = tmp2;
+
+
 	if (tmp->next)
-		tmp->next->prev = current;
-	if(current->prev)
-		current->prev->next = tmp;
-	else
-		*head = current;
-	current->next = current->next->next;
-	tmp->prev = current->prev;
-	tmp->next = current;
-	current->prev = tmp;
+		tmp->next->prev = tmp;
+
+	*node = tmp2;
+
 }
-
 /**
- * swapprev - swaps a node with the previous node in a doubly linked list
- * @current: the current node
- * @head: head of the doubly linked list
- */
-void swapprev(listint_t *current, listint_t **head)
-{
-	listint_t *tmp = NULL;
-
-	tmp = current->prev;
-	if (current->next)
-		current->next->prev = tmp;
-	if(tmp->prev)
-		tmp->prev->next = current;
-	else
-		*head = current;
-
-	current->prev = current->prev->prev;
-	tmp->next = current->next;
-	tmp->prev = current;
-	current->next = tmp;
-}
-
-/**
- * cocktail_sort_list - implmentation of the cocktail sort
- * @list: a pointer to the head of the linked list to be
- *       sorted
+ * cocktail_sort_list - function that sorts a doubly linked list
+ * of integers in ascending order using the Cocktail shaker sort algorithm
+ *
+ * @list: head of list to be sortered (Double Linked List)
+ *
+ * Return: No Return
  */
 void cocktail_sort_list(listint_t **list)
 {
-	bool swaped = true;
-	listint_t *current = *list;
+	listint_t *head, *aux;
+	int c = 0, n = -1, m = -1;
 
-	if (!current)
+	if (!list || !(*list) || (!((*list)->prev) && !((*list)->next)))
 		return;
-	while (swaped)
+
+	head = *list;
+	while (m >= n)
 	{
-		swaped = false;
-		while (current->next)
+		n++;
+		while (head->next && c != m)
 		{
-			if (current->n > current->next->n)
+			if (head->n > head->next->n)
 			{
-				/*swap*/
-				swapnext(current, list);
-				swaped = true;
-				print_list(*list);
+				aux = head;
+			       _swap(&aux, list);
+			       print_list(*list);
+			       head = aux;
 			}
-			else
-				current = current->next;
+
+			c++;
+			head = head->next;
 		}
-		while (current->prev)
+
+		if (n == 0)
+			m = c;
+		m--;
+		while (head->prev && c >= n)
 		{
-			if (current->n < current->prev->n)
+			if (head->n < head->prev->n)
 			{
-				/*swap*/
-				swapprev(current, list);
-				swaped = true;
+				aux = head->prev;
+				_swap(&aux, list);
 				print_list(*list);
+				head = aux->next;
 			}
-			else
-				current = current->prev;
+			c--;
+			head = head->prev;
 		}
 	}
 }
